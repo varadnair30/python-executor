@@ -1,3 +1,7 @@
+# Add a comment at the top of app.py
+# sed -i '1i# Updated: '$(date) app.py
+
+
 from flask import Flask, request, jsonify
 import subprocess
 import json
@@ -65,24 +69,28 @@ def execute_script_with_nsjail(script):
     try:
         # NsJail command with comprehensive security settings
         nsjail_cmd = [
-            '/usr/local/bin/nsjail',
-            '--mode', 'o',  # One-time execution mode
-            '--chroot', '/',
-            '--user', '99999',  # Non-privileged user
-            '--group', '99999',
-            '--time_limit', '30',  # 30 second hard limit
-            '--max_cpus', '1',
-            '--rlimit_as', '700',  # 700MB memory limit
-            '--rlimit_cpu', '10',  # 10 seconds CPU time
-            '--rlimit_fsize', '10',  # 10MB file size limit
-            '--rlimit_nofile', '64',  # File descriptor limit
-            '--disable_proc',  # Disable /proc access
-            '--iface_no_lo',  # No network interface
-            '--quiet',
-            '--',
-            '/usr/bin/python3',
-            script_path
-        ]
+                    '/usr/local/bin/nsjail',
+                    '--mode', 'o',
+                    '--user', '99999',
+                    '--group', '99999',
+                    '--time_limit', '30',
+                    '--rlimit_as', '700',
+                    '--rlimit_fsize', '10',
+                    '--rlimit_nofile', '50',
+                    '--skip_setsid',  # Skip session ID setting (Cloud Run compatibility)
+                    '--disable_clone_newnet',
+                    '--disable_clone_newuser',
+                    '--disable_clone_newns',
+                    '--disable_clone_newcgroup',
+                    '--disable_clone_newipc',
+                    '--disable_clone_newuts',
+                    '--disable_clone_newpid',
+                    '--quiet',
+                    '--',
+                    '/usr/local/bin/python3',
+                    script_path
+                ]
+
         
         logger.info(f"Executing script with NsJail")
         
@@ -268,4 +276,4 @@ if __name__ == '__main__':
         logger.error(f"NsJail not available: {e}")
     
     logger.info(f"Starting Flask app on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)# Build timestamp: Wed Nov 19 15:40:01 CST 2025

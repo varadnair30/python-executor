@@ -1,0 +1,50 @@
+# In your project directory, create this file
+cat > .dockerignore << 'EOF'
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.pytest_cache
+.coverage
+
+# Virtual environments
+venv
+env
+ENV
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Documentation
+*.md
+!README.md
+
+# Scripts (optional - keep if needed for reference)
+test_examples.sh
+deploy.sh
+submissions.md
+
+# Any large folders you don't need in the container
+node_modules
+EOF
