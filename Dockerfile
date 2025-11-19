@@ -37,7 +37,8 @@ RUN pip install --no-cache-dir flask gunicorn pandas numpy
 WORKDIR /app
 
 # Copy application code
-COPY app.py .
+COPY . .
+
 
 # Create non-root user for running the app
 RUN useradd -m -u 1000 appuser && \

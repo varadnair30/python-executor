@@ -69,24 +69,24 @@ def execute_script_with_nsjail(script):
     try:
         # NsJail command with comprehensive security settings
         nsjail_cmd = [
-                    '/usr/local/bin/nsjail',
-                    '--mode', 'o',
-                    '--user', '99999',
-                    '--group', '99999',
-                    '--time_limit', '30',
-                    '--rlimit_as', '700',
-                    '--rlimit_fsize', '10',
-                    '--rlimit_nofile', '50',
-                    '--skip_setsid',  # Skip session ID setting (Cloud Run compatibility)
-                    '--disable_clone_newnet',
-                    '--disable_clone_newuser',
-                    '--disable_clone_newns',
-                    '--disable_clone_newcgroup',
-                    '--disable_clone_newipc',
-                    '--disable_clone_newuts',
-                    '--disable_clone_newpid',
-                    '--quiet',
-                    '--',
+                    # '/usr/local/bin/nsjail',
+                    # '--mode', 'o',
+                    # '--user', '99999',
+                    # '--group', '99999',
+                    # '--time_limit', '30',
+                    # '--rlimit_as', '700',
+                    # '--rlimit_fsize', '10',
+                    # '--rlimit_nofile', '50',
+                    # '--skip_setsid',  # Skip session ID setting (Cloud Run compatibility)
+                    # '--disable_clone_newnet',
+                    # '--disable_clone_newuser',
+                    # '--disable_clone_newns',
+                    # '--disable_clone_newcgroup',
+                    # '--disable_clone_newipc',
+                    # '--disable_clone_newuts',
+                    # '--disable_clone_newpid',
+                    # '--quiet',
+                    # '--',
                     '/usr/local/bin/python3',
                     script_path
                 ]
