@@ -72,8 +72,6 @@ def execute_script_with_nsjail(script):
     '/usr/local/bin/nsjail',
     '-Me',
     '-t', '30',
-    '--rlimit_as', '700',
-    '--rlimit_cpu', '10',
     '--disable_proc',
     '--disable_clone_newuser',
     '--disable_clone_newnet',
@@ -82,6 +80,7 @@ def execute_script_with_nsjail(script):
     '--disable_clone_newipc',
     '--disable_clone_newuts',
     '--disable_clone_newcgroup',
+    '--disable_rlimits',  # Add this - disables rlimit enforcement
     '-q',
     '--',
     '/usr/bin/python3',
