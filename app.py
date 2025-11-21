@@ -83,7 +83,8 @@ def execute_script_with_nsjail(script):
     '--disable_rlimits',  # Add this - disables rlimit enforcement
     '-q',
     '--',
-    '/usr/bin/python3',
+    '/usr/local/bin/python3',  # Change this line
+
     script_path
 ]
 
