@@ -69,17 +69,18 @@ def execute_script_with_nsjail(script):
     try:
         # NsJail command with comprehensive security settings
         nsjail_cmd = [
-            '/usr/local/bin/nsjail',
-            '-Me',  # MODE_STANDALONE_EXECVE (no clone, direct exec)
-            '-t', '30',
-            '--rlimit_as', '700',
-            '--rlimit_cpu', '10',
-            '--disable_proc',
-            '-q',
-            '--',
-            '/usr/bin/python3',
-            script_path
-        ]
+    '/usr/local/bin/nsjail',
+    '-Me',
+    '-t', '30',
+    '--rlimit_as', '700',
+    '--rlimit_cpu', '10',
+    '--disable_proc',
+    '--disable_clone_newuser',  # Add this
+    '-q',
+    '--',
+    '/usr/bin/python3',
+    script_path
+]
 
         
         logger.info(f"Executing script with NsJail")
