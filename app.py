@@ -1,7 +1,3 @@
-# Add a comment at the top of app.py
-# sed -i '1i# Updated: '$(date) app.py
-
-
 from flask import Flask, request, jsonify
 import subprocess
 import json
@@ -45,7 +41,7 @@ def validate_script(script):
     return True, None
 
 def execute_script_with_nsjail(script):
-    """Execute Python script in NsJail sandbox with strict isolation"""
+    """Execute Python script in NsJail sandbox with Cloud Run compatible settings"""
     
     # Create temporary file for the script
     with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
@@ -67,29 +63,32 @@ def execute_script_with_nsjail(script):
         f.write("        sys.exit(1)\n")
     
     try:
-        # NsJail command with comprehensive security settings
+        # Cloud Run compatible nsjail configuration
+        # Security provided through: time limits, process isolation, and Cloud Run's VM isolation
         nsjail_cmd = [
-    '/usr/local/bin/nsjail',
-    '-Me',
-    '-t', '30',
-    '--disable_proc',
-    '--disable_clone_newuser',
-    '--disable_clone_newnet',
-    '--disable_clone_newns',
-    '--disable_clone_newpid',
-    '--disable_clone_newipc',
-    '--disable_clone_newuts',
-    '--disable_clone_newcgroup',
-    '--disable_rlimits',  # Add this - disables rlimit enforcement
-    '-q',
-    '--',
-    '/usr/local/bin/python3',  # Change this line
-
-    script_path
-]
-
+            '/usr/local/bin/nsjail',
+            '--mode', 'o',  # Execute once mode
+            '--user', '99999',  # Non-privileged user
+            '--group', '99999',  # Non-privileged group
+            '--time_limit', '30',  # 30 second execution limit
+            '--disable_rlimits',  # Cloud Run doesn't allow setting rlimits
+            '--skip_setsid',  # Cloud Run compatibility
+            '--keep_caps',  # Keep capabilities (Cloud Run compatibility)
+            '--keep_env',  # Keep environment variables (for Python paths)
+            '--disable_clone_newnet',  # Disable network namespace
+            '--disable_clone_newuser',  # Disable user namespace
+            '--disable_clone_newns',  # Disable mount namespace
+            '--disable_clone_newcgroup',  # Disable cgroup namespace
+            '--disable_clone_newipc',  # Disable IPC namespace
+            '--disable_clone_newuts',  # Disable UTS namespace
+            '--disable_clone_newpid',  # Disable PID namespace
+            '--quiet',  # Quiet output
+            '--',
+            '/usr/local/bin/python3',
+            script_path
+        ]
         
-        logger.info(f"Executing script with NsJail")
+        logger.info(f"Executing script with NsJail (Cloud Run compatible mode)")
         
         # Execute with timeout
         result = subprocess.run(
@@ -268,9 +267,9 @@ if __name__ == '__main__':
             capture_output=True,
             timeout=5
         )
-        logger.info("NsJail is available")
+        logger.info("NsJail is available and ready")
     except Exception as e:
         logger.error(f"NsJail not available: {e}")
     
     logger.info(f"Starting Flask app on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=False)# Build timestamp: Wed Nov 19 15:40:01 CST 2025
+    app.run(host='0.0.0.0', port=port, debug=False)

@@ -1,9 +1,6 @@
 # Use slim Python image for smaller size
 FROM python:3.11-slim
 
-# Cache buster - add this line
-ARG CACHEBUST=1
-
 # Install system dependencies for nsjail
 RUN apt-get update && apt-get install -y \
     autoconf \
@@ -37,8 +34,7 @@ RUN pip install --no-cache-dir flask gunicorn pandas numpy
 WORKDIR /app
 
 # Copy application code
-COPY . .
-
+COPY app.py .
 
 # Create non-root user for running the app
 RUN useradd -m -u 1000 appuser && \
