@@ -63,28 +63,41 @@ def execute_script_with_nsjail(script):
         f.write("        sys.exit(1)\n")
     
     try:
-        # Cloud Run compatible nsjail configuration
-        # Security provided through: time limits, process isolation, and Cloud Run's VM isolation
+        # Cloud Run compatible nsjail with stronger isolation
         nsjail_cmd = [
             '/usr/local/bin/nsjail',
-            '--mode', 'o',  # Execute once mode
-            '--user', '99999',  # Non-privileged user
-            '--group', '99999',  # Non-privileged group
-            '--time_limit', '30',  # 30 second execution limit
-            '--disable_rlimits',  # Cloud Run doesn't allow setting rlimits
-            '--skip_setsid',  # Cloud Run compatibility
-            '--keep_caps',  # Keep capabilities (Cloud Run compatibility)
-            '--keep_env',  # Keep environment variables (for Python paths)
-            '--disable_clone_newnet',  # Disable network namespace
-            '--disable_clone_newuser',  # Disable user namespace
-            '--disable_clone_newns',  # Disable mount namespace
-            '--disable_clone_newcgroup',  # Disable cgroup namespace
-            '--disable_clone_newipc',  # Disable IPC namespace
-            '--disable_clone_newuts',  # Disable UTS namespace
-            '--disable_clone_newpid',  # Disable PID namespace
-            '--quiet',  # Quiet output
+            '-Me',  # Execve mode
+            '--user', '99999',
+            '--group', '99999',
+            '--time_limit', '30',
+            # Resource limits (without RTPRIO)
+            '--rlimit_as', '700',
+            '--rlimit_cpu', '20', 
+            '--rlimit_fsize', '1',
+            '--rlimit_nofile', '32',
+            '--rlimit_nproc', 'soft',  # Use soft limit
+            '--rlimit_stack', 'soft',  # Use soft limit
+            # Skip problematic rlimits
+            '--disable_no_new_privs',  # May help with capabilities
+            # Filesystem isolation
+            '-R', '/usr/local/lib/python3.11',
+            '-R', '/usr/local/bin/python3.11',
+            '-R', '/lib',
+            '-R', '/lib64',
+            '-R', '/usr/lib',
+            '--tmpfsmount', '/tmp',
+            '-E', 'PATH=/usr/local/bin:/usr/bin:/bin',
+            # Namespace isolation
+            '--disable_clone_newnet',
+            '--disable_clone_newuser',
+            '--disable_clone_newns',
+            '--disable_clone_newcgroup',
+            '--disable_clone_newipc',
+            '--disable_clone_newuts',
+            '--disable_clone_newpid',
+            '--quiet',
             '--',
-            '/usr/local/bin/python3',
+            '/usr/local/bin/python3.11',
             script_path
         ]
         
