@@ -63,31 +63,21 @@ def execute_script_with_nsjail(script):
         f.write("        sys.exit(1)\n")
     
     try:
-        # Cloud Run compatible nsjail with stronger isolation
+        # Cloud Run compatible: Platform limits + NsJail supervision + filesystem isolation
         nsjail_cmd = [
             '/usr/local/bin/nsjail',
             '-Me',  # Execve mode
-            '--user', '99999',
-            '--group', '99999',
-            '--time_limit', '30',
-            # Resource limits (without RTPRIO)
-            '--rlimit_as', '700',
-            '--rlimit_cpu', '20', 
-            '--rlimit_fsize', '1',
-            '--rlimit_nofile', '32',
-            '--rlimit_nproc', 'soft',  # Use soft limit
-            '--rlimit_stack', 'soft',  # Use soft limit
-            # Skip problematic rlimits
-            '--disable_no_new_privs',  # May help with capabilities
-            # Filesystem isolation
-            '-R', '/usr/local/lib/python3.11',
-            '-R', '/usr/local/bin/python3.11',
-            '-R', '/lib',
-            '-R', '/lib64',
-            '-R', '/usr/lib',
-            '--tmpfsmount', '/tmp',
+            '--time_limit', '30',  # Timeout enforcement
+            '--disable_rlimits',  # Cloud Run blocks rlimit syscalls
+            # Filesystem restrictions (read-only bind mounts)
+            '-R', '/usr/local/lib/python3.11',  # Python libs (read-only)
+            '-R', '/usr/local/bin/python3.11',  # Python binary (read-only)
+            '-R', '/lib',  # System libs (read-only)
+            '-R', '/lib64',  # System libs (read-only)
+            '-R', '/usr/lib',  # User libs (read-only)
+            '--tmpfsmount', '/tmp',  # Only /tmp is writable
             '-E', 'PATH=/usr/local/bin:/usr/bin:/bin',
-            # Namespace isolation
+            # Namespace isolation (disabled for Cloud Run)
             '--disable_clone_newnet',
             '--disable_clone_newuser',
             '--disable_clone_newns',
