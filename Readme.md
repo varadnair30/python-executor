@@ -1,8 +1,4 @@
-Here's a **concise, professional README.md with ~380 lines**:
 
-***
-
-```markdown
 # Python Code Executor Service
 
 A secure, sandboxed Python code execution service built with Flask and NsJail, deployed on Google Cloud Run.
